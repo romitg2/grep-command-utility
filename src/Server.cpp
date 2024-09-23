@@ -1,16 +1,30 @@
 #include <iostream>
 #include <string>
 
-bool match_pattern(const std::string &input_line, const std::string &pattern) {
-  if (pattern == "\\d") {
-    for (char c : input_line) {
-      if (!isdigit(c)) {
-        return false;
-      }
+bool isDigitExist(std::string str) {
+  for (int i = 0; i < str.size(); i++) {
+    if (isdigit(str[i])) {
+      return true;
     }
-    return true;
   }
-  if (pattern.length() == 1) {
+  return false;
+}
+
+bool isAlphaNumeric(std::string str) {
+  for (int i = 0; i < str.size(); i++) {
+    if (isalnum(str[i]) == 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool match_pattern(const std::string &input_line, const std::string &pattern) {
+  if (pattern == "\\w") {
+    return isAlphaNumeric(input_line);
+  } else if (pattern == "\\d") {
+    return isDigitExist(input_line);
+  } else if (pattern.length() == 1) {
     return input_line.find(pattern) != std::string::npos;
   } else {
     throw std::runtime_error("Unhandled pattern " + pattern);
