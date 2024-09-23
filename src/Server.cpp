@@ -2,6 +2,14 @@
 #include <string>
 
 bool match_pattern(const std::string &input_line, const std::string &pattern) {
+  if (pattern == "\\d") {
+    for (char c : input_line) {
+      if (!isdigit(c)) {
+        return false;
+      }
+    }
+    return true;
+  }
   if (pattern.length() == 1) {
     return input_line.find(pattern) != std::string::npos;
   } else {
