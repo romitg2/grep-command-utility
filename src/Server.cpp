@@ -35,10 +35,27 @@ bool characterGroupMatch(const std::string &input_line,
   return false;
 }
 
+bool negativeCharacterGroupMatch(const std::string &input_line,
+                                 const std::string &pattern) {
+  std::unordered_set<char> pattern_set;
+  for (int i = 2; i < pattern.size() - 1; i++) {
+    pattern_set.insert(pattern[i]);
+  }
+  for (int i = 0; i < input_line.size(); i++) {
+    if (pattern_set.find(input_line[i]) != pattern_set.end()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool match_pattern(const std::string &input_line, const std::string &pattern) {
   if (pattern.length() >= 3 && pattern[0] == '[' &&
       pattern[pattern.length() - 1] == ']') {
-    return characterGroupMatch(input_line, pattern);
+    if (pattern[1] == '^')
+      return negativeCharacterGroupMatch(input_line, pattern);
+    else
+      return characterGroupMatch(input_line, pattern);
   }
   if (pattern == "\\w") {
     return isAlphaNumeric(input_line);
