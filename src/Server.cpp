@@ -21,7 +21,8 @@ bool isAlphaNumeric(std::string str) {
 }
 
 bool characterGroupMatch(const std::string &input_line,
-                         const std::string &pattern) {
+                         const std::string &pattern, int start, int end) {
+
   std::unordered_set<char> pattern_set;
   for (int i = 1; i < pattern.size() - 1; i++) {
     pattern_set.insert(pattern[i]);
@@ -36,7 +37,8 @@ bool characterGroupMatch(const std::string &input_line,
 }
 
 bool negativeCharacterGroupMatch(const std::string &input_line,
-                                 const std::string &pattern) {
+                                 const std::string &pattern, int start,
+                                 int end) {
   std::unordered_set<char> pattern_set;
   for (int i = 2; i < pattern.size() - 1; i++) {
     pattern_set.insert(pattern[i]);
@@ -75,9 +77,10 @@ bool match(const std::string &input_line, const std::string &pattern) {
                 j++;
             }
             if (pattern[j] == '^') {
-              return negitiveMatchGroup(input_line, pattern, start, j + 1);
+              return negativeCharacterGroupMatch(input_line, pattern, start,
+                                                 j + 1);
             } else {
-              return positiveMatchGroup(input_line, pattern, start, j + 1);
+              return characterGroupMatch(input_line, pattern, start, j + 1);
             }
           }
         } else {
@@ -96,6 +99,17 @@ bool match(const std::string &input_line, const std::string &pattern) {
     i++;
   }
 
+  return false;
+}
+
+bool stringAnchorMatch(const std::string &input_line,
+                       const std::string &pattern) {
+  if (pattern[0] == '^') {
+    return input_line.find(pattern.substr(1)) == 0;
+  } else if (pattern[pattern.size() - 1] == '$') {
+    return input_line.find(pattern.substr(0, pattern.size() - 1)) ==
+           input_line.size() - pattern.size() + 1;
+  }
   return false;
 }
 
