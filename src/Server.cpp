@@ -14,10 +14,10 @@ bool isDigitExist(std::string str) {
 bool isAlphaNumeric(std::string str) {
   for (int i = 0; i < str.size(); i++) {
     if (isalnum(str[i]) == 0) {
-      return false;
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 bool characterGroupMatch(const std::string &input_line,
@@ -49,6 +49,56 @@ bool negativeCharacterGroupMatch(const std::string &input_line,
   return true;
 }
 
+bool match(const std::string &input_line, const std::string &pattern) {
+  int i = 0;
+  while (i < input_line.size()) {
+    int j = 0;
+    int temp = i;
+    while (j < pattern.size() && temp < input_line.size()) {
+      if (pattern[j] == '\\') {
+        j++;
+        if (j < pattern.size()) {
+          if (pattern[j] == 'd') {
+            if (!isdigit(input_line[temp])) {
+              break;
+            } else
+              temp++;
+          } else if (pattern[j] == 'w') {
+            if (!isalnum(input_line[temp])) {
+              break;
+            } else
+              temp++;
+          } else if (pattern[j] == '[') {
+            int start = j;
+            while (j < pattern.size()) {
+              if (pattern[j] != ']')
+                j++;
+            }
+            if (pattern[j] == '^') {
+              return negitiveMatchGroup(input_line, pattern, start, j + 1);
+            } else {
+              return positiveMatchGroup(input_line, pattern, start, j + 1);
+            }
+          }
+        } else {
+          break;
+        }
+      } else {
+        if (input_line[temp] != pattern[j]) {
+          break;
+        } else
+          temp++;
+      }
+      j++;
+    }
+    if (j == pattern.size())
+      return true;
+    i++;
+  }
+
+  return false;
+}
+
 bool match_pattern(const std::string &input_line, const std::string &pattern) {
   if (pattern.length() >= 3 && pattern[0] == '[' &&
       pattern[pattern.length() - 1] == ']') {
@@ -58,11 +108,13 @@ bool match_pattern(const std::string &input_line, const std::string &pattern) {
       return characterGroupMatch(input_line, pattern);
   }
   if (pattern == "\\w") {
-    return isAlphaNumeric(input_line);
+    return !isAlphaNumeric(input_line);
   } else if (pattern == "\\d") {
-    return isDigitExist(input_line);
+    return !isDigitExist(input_line);
   } else if (pattern.length() == 1) {
     return input_line.find(pattern) != std::string::npos;
+  } else if (pattern.length() > 3) {
+    return match(input_line, pattern);
   } else {
     throw std::runtime_error("Unhandled pattern " + pattern);
   }
